@@ -40,7 +40,10 @@
             const orderDate = row.querySelector('td:nth-child(2)').innerText; // 日付
             const paymentStatus = row.querySelector('td:nth-child(3)').innerText; // 支払状況
             const shippingStatus = row.querySelector('td:nth-child(4)').innerText; // 発送状況
-            const totalAmount = row.querySelector('td:nth-child(5) span').innerText; // 合計金額
+            // 合計金額の処理
+            const totalAmountElement = row.querySelector('td:nth-child(5) span'); // 合計金額の要素を取得
+            let totalAmount = totalAmountElement ? totalAmountElement.getAttribute('data-price') : ''; // data-price 属性を取得
+            let currency = totalAmountElement ? totalAmountElement.getAttribute('data-currency') : ''; // data-currency 属性を取得
             const detailLink = row.querySelector('td:nth-child(1) a').href; // 詳細リンク
 
             // 詳細ページのデータを取得
@@ -48,7 +51,8 @@
             console.log(`日付: ${orderDate}`);
             console.log(`支払状況: ${paymentStatus}`);
             console.log(`発送状況: ${shippingStatus}`);
-            console.log(`合計金額: ${totalAmount}`);
+            console.log(`合計金額 (data-price): ${totalAmount}`);
+            console.log(`通貨 (data-currency): ${currency}`);
             console.log(`詳細リンク: ${detailLink}`);
             const detailData = await fetchDetailData(detailLink);
 
@@ -61,6 +65,7 @@
                 支払状況: paymentStatus,
                 発送状況: shippingStatus,
                 合計金額: totalAmount,
+                通貨: currency,
                 詳細: detailData
             });
         }
@@ -197,8 +202,6 @@
             alert('データ取得を開始します！');
             const initialUrl = window.location.href; // 現在のページのURLを取得
             await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
-            downloadCSV(allData);
-            alert('すべてのページのデータを取得しました！');
         });
 
         document.body.appendChild(button);
