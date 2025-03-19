@@ -13,9 +13,28 @@
 
     let allData = []; // 全ページのデータを格納する配列
 
-    // 現在のページのデータを取得
-    async function getPageData() {
-        const rows = document.querySelectorAll('.AccountTable tbody tr'); // テーブルの行を取得
+    // 次のページのデータを再帰的に取得
+    async function fetchNextPageAndGetData(url) {
+        if (!url) {
+            // 次のページがない場合、データをダウンロード
+            downloadCSV(allData);
+            alert('すべてのページのデータを取得しました！');
+            return;
+        }
+
+        console.log(`Fetching data from: ${url}`);
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error(`HTTPエラー: ${response.status} ${response.statusText}`);
+            return;
+        }
+
+        const text = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+
+        // 現在のページのデータを取得
+        const rows = doc.querySelectorAll('.AccountTable tbody tr'); // テーブルの行を取得
         for (const row of rows) {
             const orderNumber = row.querySelector('td:nth-child(1) a').innerText; // 注文番号
             const orderDate = row.querySelector('td:nth-child(2)').innerText; // 日付
@@ -45,6 +64,15 @@
                 詳細: detailData
             });
         }
+
+        debugger;
+
+        // 次のページのURLを取得
+        const nextButton = doc.querySelector('.Pagination_arrow.-next'); // 次ページボタンのクラス名を指定
+        const nextPageUrl = nextButton ? nextButton.href : null;
+
+        // 再帰的に次のページを取得
+        await fetchNextPageAndGetData(nextPageUrl);
     }
 
     // 詳細ページのデータを取得
@@ -129,24 +157,6 @@
         };
     }
 
-    // 次のページに移動してデータを取得
-    async function goToNextPageAndGetData() {
-        const nextButton = document.querySelector('.Pagination_arrow.-next'); // 次ページボタンのクラス名を指定
-        if (nextButton) {
-            debugger;
-            nextButton.click(); // 次のページに移動
-            console.log('次のページに移動します...');
-            setTimeout(async () => {
-                await getPageData(); // 次のページのデータを取得
-                await goToNextPageAndGetData(); // 再帰的に次のページを処理
-            }, 3000); // ページ遷移後に3秒待機
-        } else {
-            // 次のページがない場合、データをダウンロード
-            downloadCSV(allData);
-            alert('すべてのページのデータを取得しました！');
-        }
-    }
-
     // CSV形式に変換
     function convertToCSV(data) {
         const headers = Object.keys(data[0]).join(',');
@@ -185,8 +195,10 @@
 
         button.addEventListener('click', async () => {
             alert('データ取得を開始します！');
-            await getPageData(); // 現在のページのデータを取得
-            await goToNextPageAndGetData(); // 再帰的に次のページのデータを取得
+            const initialUrl = window.location.href; // 現在のページのURLを取得
+            await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
+            downloadCSV(allData);
+            alert('すべてのページのデータを取得しました！');
         });
 
         document.body.appendChild(button);
