@@ -17,7 +17,7 @@
     async function fetchNextPageAndGetData(url) {
         if (!url) {
             // 次のページがない場合、データをダウンロード
-            downloadCSV(allData);
+            downloadJSON(allData);
             alert('すべてのページのデータを取得しました！');
             return;
         }
@@ -162,20 +162,10 @@
         };
     }
 
-    // CSV形式に変換
-    function convertToCSV(data) {
-        const headers = Object.keys(data[0]).join(',');
-        const rows = data.map(row => {
-            const detailString = row.詳細.商品詳細.map(d => `${d.商品名}(${d.数量})`).join('; ');
-            return `${row.注文番号},${row.日付},${row.支払状況},${row.発送状況},${row.合計金額},"${detailString}"`;
-        });
-        return [headers, ...rows].join('\n');
-    }
-
-    // CSVをダウンロード
-    function downloadCSV(data, filename = 'purchase_history.csv') {
-        const csv = convertToCSV(data);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    // JSONをダウンロード
+    function downloadJSON(data, filename = 'purchase_history.json') {
+        const json = JSON.stringify(data, null, 2); // JSON形式に変換（インデント付き）
+        const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = filename;
