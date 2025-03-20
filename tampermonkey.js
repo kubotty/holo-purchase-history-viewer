@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  購入履歴の詳細情報を取得し、次のページに自動遷移
-// @author       Your Name
+// @author       kubotty
 // @match        https://shop.hololivepro.com/account*
 // @grant        none
 // ==/UserScript==
@@ -70,8 +70,6 @@
             });
         }
 
-        debugger;
-
         // 次のページのURLを取得
         const nextButton = doc.querySelector('.Pagination_arrow.-next'); // 次ページボタンのクラス名を指定
         const nextPageUrl = nextButton ? nextButton.href : null;
@@ -95,7 +93,6 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
         console.log(doc);
-        debugger;
 
         // 商品情報を取得
         const items = doc.querySelectorAll('.CartItem'); // 商品リストのクラス名
