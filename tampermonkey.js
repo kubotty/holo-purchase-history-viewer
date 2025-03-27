@@ -198,4 +198,96 @@
 
     // ページ読み込み後にボタンを追加
     window.addEventListener('load', addStartButton);
+
+    // 商品名検索インターフェースを追加
+    function addSearchInterface() {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '10px';
+        container.style.right = '10px';
+        container.style.width = '300px';
+        container.style.padding = '15px';
+        container.style.backgroundColor = 'white';
+        container.style.border = '1px solid #ccc';
+        container.style.borderRadius = '5px';
+        container.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+        container.style.zIndex = 1000;
+
+        const title = document.createElement('h3');
+        title.innerText = '商品検索';
+        title.style.margin = '0 0 10px 0';
+        title.style.fontSize = '16px';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = '商品名を入力';
+        input.style.width = '100%';
+        input.style.padding = '8px';
+        input.style.marginBottom = '10px';
+        input.style.border = '1px solid #ccc';
+        input.style.borderRadius = '3px';
+
+        const searchButton = document.createElement('button');
+        searchButton.innerText = '検索';
+        searchButton.style.width = '100%';
+        searchButton.style.padding = '10px';
+        searchButton.style.backgroundColor = '#2196F3';
+        searchButton.style.color = 'white';
+        searchButton.style.border = 'none';
+        searchButton.style.borderRadius = '3px';
+        searchButton.style.cursor = 'pointer';
+
+        const resultContainer = document.createElement('div');
+        resultContainer.style.marginTop = '10px';
+        resultContainer.style.maxHeight = '200px';
+        resultContainer.style.overflowY = 'auto';
+        resultContainer.style.borderTop = '1px solid #ccc';
+        resultContainer.style.paddingTop = '10px';
+
+        searchButton.addEventListener('click', () => {
+            const query = input.value.trim();
+            resultContainer.innerHTML = ''; // 検索結果をクリア
+            if (!query) {
+                alert('検索キーワードを入力してください。');
+                return;
+            }
+
+            // allDataから商品名を検索
+            const results = [];
+            allData.forEach(order => {
+                if (order.詳細 && order.詳細.商品詳細) {
+                    order.詳細.商品詳細.forEach(item => {
+                        if (item.商品名.includes(query)) {
+                            results.push(item);
+                        }
+                    });
+                }
+            });
+
+            if (results.length === 0) {
+                resultContainer.innerHTML = '<p>該当する商品が見つかりませんでした。</p>';
+            } else {
+                results.forEach(item => {
+                    const resultItem = document.createElement('div');
+                    resultItem.style.marginBottom = '10px';
+                    resultItem.innerHTML = `
+                        <p><strong>商品名:</strong> ${item.商品名}</p>
+                        <p><strong>バリエーション:</strong> ${item.バリエーション}</p>
+                        <p><strong>数量:</strong> ${item.数量}</p>
+                        <p><strong>合計金額:</strong> ${item.合計金額}</p>
+                    `;
+                    resultContainer.appendChild(resultItem);
+                });
+            }
+        });
+
+        container.appendChild(title);
+        container.appendChild(input);
+        container.appendChild(searchButton);
+        container.appendChild(resultContainer);
+        document.body.appendChild(container);
+    }
+
+    // ページ読み込み後に検索インターフェースを追加
+    window.addEventListener('load', addSearchInterface);
 })();
