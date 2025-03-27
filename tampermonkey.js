@@ -13,12 +13,31 @@
 (function() {
     'use strict';
 
-    let allData = []; // 全ページのデータを格納する配列
+    let allData = loadPreviousData(); // 全ページのデータを格納する配列
+
+    // 過去データをローカルストレージから取得
+    function loadPreviousData() {
+        const storedData = localStorage.getItem('purchaseHistory');
+        return storedData ? JSON.parse(storedData) : [];
+    }
+
+    // データをローカルストレージに保存
+    function saveDataToLocalStorage(data) {
+        localStorage.setItem('purchaseHistory', JSON.stringify(data));
+        // 1. 開発者ツール
+        // 2. 「Application」タブを選択
+        // 3. 左側の「Storage」セクションから「Local Storage」を選択。
+        // 4. 対象のドメインを選択すると、保存されたデータが表示されます。
+    }
 
     // 次のページのデータを再帰的に取得
     async function fetchNextPageAndGetData(url) {
         if (!url) {
-            // 次のページがない場合、データをダウンロード
+            // 次のページがない場合、データを保存してダウンロード
+            // 注文番号を昇順にソート
+            allData.sort((a, b) => a.注文番号.localeCompare(b.注文番号, 'ja', { numeric: true }));
+
+            saveDataToLocalStorage(allData);
             downloadJSON(allData);
             alert('すべてのページのデータを取得しました！');
             return;
@@ -47,6 +66,16 @@
             let totalAmount = totalAmountElement ? totalAmountElement.getAttribute('data-price') : ''; // data-price 属性を取得
             let currency = totalAmountElement ? totalAmountElement.getAttribute('data-currency') : ''; // data-currency 属性を取得
             const detailLink = row.querySelector('td:nth-child(1) a').href; // 詳細リンク
+
+            // 既存データの確認
+            const existingOrder = allData.find(data => data.注文番号 === orderNumber);
+            if (existingOrder) {
+                // 支払状況・発送状況を更新
+                existingOrder.支払状況 = paymentStatus;
+                existingOrder.発送状況 = shippingStatus;
+                console.log(`注文番号 ${orderNumber} は既存データのためスキップ`);
+                continue;
+            }
 
             // 詳細ページのデータを取得
             console.log(`注文番号: ${orderNumber}`);
