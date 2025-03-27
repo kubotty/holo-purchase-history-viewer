@@ -247,6 +247,13 @@
         searchButton.addEventListener('click', () => {
             const query = input.value.trim();
             resultContainer.innerHTML = ''; // 検索結果をクリア
+
+            // allDataが空の場合のエラーチェック
+            if (allData.length === 0) {
+                alert('データが空です。先にデータを取得してください。');
+                return;
+            }
+
             if (!query) {
                 alert('検索キーワードを入力してください。');
                 return;
