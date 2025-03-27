@@ -34,6 +34,9 @@
     async function fetchNextPageAndGetData(url) {
         if (!url) {
             // 次のページがない場合、データを保存してダウンロード
+            // 注文番号を昇順にソート
+            allData.sort((a, b) => a.注文番号.localeCompare(b.注文番号, 'ja', { numeric: true }));
+
             saveDataToLocalStorage(allData);
             downloadJSON(allData);
             alert('すべてのページのデータを取得しました！');
