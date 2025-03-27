@@ -1,12 +1,13 @@
 // ==UserScript==
-// @name         購入履歴詳細取得
+// @name         購入履歴検索ツール
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  購入履歴の詳細情報を取得し、次のページに自動遷移
 // @author       kubotty
 // @match        https://shop.hololivepro.com/account
 // @match        https://shop.hololivepro.com/account/
-// @match        https://shop.hololivepro.com/account/?page=1
+// @match        https://shop.hololivepro.com/account?page=*
+// @match        https://shop.hololivepro.com/account/?page=*
 // @grant        none
 // ==/UserScript==
 
@@ -200,31 +201,126 @@
         link.click();
     }
 
-    // ボタンを追加
-    function addStartButton() {
-        const button = document.createElement('button');
-        button.innerText = 'データ取得開始';
-        button.style.position = 'fixed';
-        button.style.bottom = '10px'; // 画面下から10px
-        button.style.right = '10px'; // 画面右から10px
-        button.style.zIndex = 1000;
-        button.style.padding = '10px';
-        button.style.backgroundColor = '#4CAF50';
-        button.style.color = 'white';
-        button.style.border = 'none';
-        button.style.borderRadius = '5px'; // ボタンの角を丸くする
-        button.style.cursor = 'pointer';
-        button.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)'; // ボタンに影を追加
+    function addInterface() {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.bottom = '10px'; // 画面下から10px
+        container.style.right = '10px'; // 画面右から10px
+        container.style.width = '400px';
+        container.style.padding = '15px';
+        container.style.backgroundColor = 'white';
+        container.style.border = '1px solid #ccc';
+        container.style.borderRadius = '5px';
+        container.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+        container.style.zIndex = 1000;
 
-        button.addEventListener('click', async () => {
+        const title = document.createElement('h3');
+        title.innerText = '購入履歴検索ツール';
+        title.style.margin = '0 0 10px 0';
+        title.style.fontSize = '16px';
+
+        const startButton = document.createElement('button');
+        startButton.innerText = 'データ取得開始';
+        startButton.style.width = '100%';
+        startButton.style.padding = '10px';
+        startButton.style.backgroundColor = '#4CAF50';
+        startButton.style.color = 'white';
+        startButton.style.border = 'none';
+        startButton.style.borderRadius = '3px';
+        startButton.style.cursor = 'pointer';
+        startButton.style.marginBottom = '10px';
+
+        startButton.addEventListener('click', async () => {
             alert('データ取得を開始します！');
             const initialUrl = window.location.href; // 現在のページのURLを取得
             await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
         });
 
-        document.body.appendChild(button);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = '商品名を入力';
+        input.style.width = '100%';
+        input.style.padding = '8px';
+        input.style.marginBottom = '10px';
+        input.style.border = '1px solid #ccc';
+        input.style.borderRadius = '3px';
+
+            // Enterキーで検索を実行
+        input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchButton.click(); // 検索ボタンのクリックイベントをトリガー
+            }
+        });
+
+        const searchButton = document.createElement('button');
+        searchButton.innerText = '検索';
+        searchButton.style.width = '100%';
+        searchButton.style.padding = '10px';
+        searchButton.style.backgroundColor = '#2196F3';
+        searchButton.style.color = 'white';
+        searchButton.style.border = 'none';
+        searchButton.style.borderRadius = '3px';
+        searchButton.style.cursor = 'pointer';
+
+        const resultContainer = document.createElement('div');
+        resultContainer.style.marginTop = '10px';
+        resultContainer.style.maxHeight = '200px';
+        resultContainer.style.overflowY = 'auto';
+        resultContainer.style.borderTop = '1px solid #ccc';
+        resultContainer.style.paddingTop = '10px';
+
+        searchButton.addEventListener('click', () => {
+            const query = input.value.trim();
+            resultContainer.innerHTML = ''; // 検索結果をクリア
+
+            // allDataが空の場合のエラーチェック
+            if (allData.length === 0) {
+                alert('データが空です。先にデータを取得してください。');
+                return;
+            }
+
+            if (!query) {
+                alert('検索キーワードを入力してください。');
+                return;
+            }
+
+            // allDataから商品名を検索
+            const results = [];
+            allData.forEach(order => {
+                if (order.詳細 && order.詳細.商品詳細) {
+                    order.詳細.商品詳細.forEach(item => {
+                        if (item.商品名.includes(query)) {
+                            results.push(item);
+                        }
+                    });
+                }
+            });
+
+            if (results.length === 0) {
+                resultContainer.innerHTML = '<p>該当する商品が見つかりませんでした。</p>';
+            } else {
+                results.forEach(item => {
+                    const resultItem = document.createElement('div');
+                    resultItem.style.marginBottom = '10px';
+                    resultItem.innerHTML = `
+                        <p><strong>商品名:</strong> ${item.商品名}</p>
+                        <p><strong>バリエーション:</strong> ${item.バリエーション}</p>
+                        <p><strong>数量:</strong> ${item.数量}</p>
+                        <p><strong>合計金額:</strong> ${item.合計金額}</p>
+                    `;
+                    resultContainer.appendChild(resultItem);
+                });
+            }
+        });
+
+        container.appendChild(title);
+        container.appendChild(startButton);
+        container.appendChild(input);
+        container.appendChild(searchButton);
+        container.appendChild(resultContainer);
+        document.body.appendChild(container);
     }
 
-    // ページ読み込み後にボタンを追加
-    window.addEventListener('load', addStartButton);
+    // ページ読み込み後にインターフェースを追加
+    window.addEventListener('load', addInterface);
 })();
