@@ -4,9 +4,7 @@
 // @version      1.0
 // @description  購入履歴の詳細情報を取得し、次のページに自動遷移
 // @author       kubotty
-// @match        https://shop.hololivepro.com/account
-// @match        https://shop.hololivepro.com/account/
-// @match        https://shop.hololivepro.com/account/?page=1
+// @match        https://shop.hololivepro.com/account*
 // @grant        none
 // ==/UserScript==
 
