@@ -242,6 +242,13 @@
         input.style.border = '1px solid #ccc';
         input.style.borderRadius = '3px';
 
+            // Enterキーで検索を実行
+        input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchButton.click(); // 検索ボタンのクリックイベントをトリガー
+            }
+        });
+
         const searchButton = document.createElement('button');
         searchButton.innerText = '検索';
         searchButton.style.width = '100%';
