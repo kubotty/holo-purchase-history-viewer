@@ -200,40 +200,11 @@
         link.click();
     }
 
-    // ボタンを追加
-    function addStartButton() {
-        const button = document.createElement('button');
-        button.innerText = 'データ取得開始';
-        button.style.position = 'fixed';
-        button.style.bottom = '10px'; // 画面下から10px
-        button.style.right = '10px'; // 画面右から10px
-        button.style.zIndex = 1000;
-        button.style.padding = '10px';
-        button.style.backgroundColor = '#4CAF50';
-        button.style.color = 'white';
-        button.style.border = 'none';
-        button.style.borderRadius = '5px'; // ボタンの角を丸くする
-        button.style.cursor = 'pointer';
-        button.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)'; // ボタンに影を追加
-
-        button.addEventListener('click', async () => {
-            alert('データ取得を開始します！');
-            const initialUrl = window.location.href; // 現在のページのURLを取得
-            await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
-        });
-
-        document.body.appendChild(button);
-    }
-
-    // ページ読み込み後にボタンを追加
-    window.addEventListener('load', addStartButton);
-
-    // 商品名検索インターフェースを追加
-    function addSearchInterface() {
+    function addInterface() {
         const container = document.createElement('div');
         container.style.position = 'fixed';
-        container.style.top = '10px';
-        container.style.right = '10px';
+        container.style.bottom = '10px'; // 画面下から10px
+        container.style.right = '10px'; // 画面右から10px
         container.style.width = '300px';
         container.style.padding = '15px';
         container.style.backgroundColor = 'white';
@@ -243,9 +214,26 @@
         container.style.zIndex = 1000;
 
         const title = document.createElement('h3');
-        title.innerText = '商品検索';
+        title.innerText = '購入履歴ツール';
         title.style.margin = '0 0 10px 0';
         title.style.fontSize = '16px';
+
+        const startButton = document.createElement('button');
+        startButton.innerText = 'データ取得開始';
+        startButton.style.width = '100%';
+        startButton.style.padding = '10px';
+        startButton.style.backgroundColor = '#4CAF50';
+        startButton.style.color = 'white';
+        startButton.style.border = 'none';
+        startButton.style.borderRadius = '3px';
+        startButton.style.cursor = 'pointer';
+        startButton.style.marginBottom = '10px';
+
+        startButton.addEventListener('click', async () => {
+            alert('データ取得を開始します！');
+            const initialUrl = window.location.href; // 現在のページのURLを取得
+            await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
+        });
 
         const input = document.createElement('input');
         input.type = 'text';
@@ -318,12 +306,13 @@
         });
 
         container.appendChild(title);
+        container.appendChild(startButton);
         container.appendChild(input);
         container.appendChild(searchButton);
         container.appendChild(resultContainer);
         document.body.appendChild(container);
     }
 
-    // ページ読み込み後に検索インターフェースを追加
-    window.addEventListener('load', addSearchInterface);
+    // ページ読み込み後にインターフェースを追加
+    window.addEventListener('load', addInterface);
 })();
