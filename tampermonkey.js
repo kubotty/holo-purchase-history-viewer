@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         購入履歴詳細取得
+// @name         購入履歴検索ツール
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  購入履歴の詳細情報を取得し、次のページに自動遷移
@@ -206,7 +206,7 @@
         container.style.position = 'fixed';
         container.style.bottom = '10px'; // 画面下から10px
         container.style.right = '10px'; // 画面右から10px
-        container.style.width = '300px';
+        container.style.width = '400px';
         container.style.padding = '15px';
         container.style.backgroundColor = 'white';
         container.style.border = '1px solid #ccc';
@@ -215,7 +215,7 @@
         container.style.zIndex = 1000;
 
         const title = document.createElement('h3');
-        title.innerText = '購入履歴ツール';
+        title.innerText = '購入履歴検索ツール';
         title.style.margin = '0 0 10px 0';
         title.style.fontSize = '16px';
 
