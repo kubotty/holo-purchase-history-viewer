@@ -39,7 +39,6 @@
             allData.sort((a, b) => a.注文番号.localeCompare(b.注文番号, 'ja', { numeric: true }));
 
             saveDataToLocalStorage(allData);
-            downloadJSON(allData);
             alert('すべてのページのデータを取得しました！');
             return;
         }
@@ -245,7 +244,7 @@
         input.style.border = '1px solid #ccc';
         input.style.borderRadius = '3px';
 
-            // Enterキーで検索を実行
+        // Enterキーで検索を実行
         input.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 searchButton.click(); // 検索ボタンのクリックイベントをトリガー
@@ -313,11 +312,59 @@
             }
         });
 
+        const actionContainer = document.createElement('div');
+        actionContainer.style.display = 'flex'; // 横並びにする
+        actionContainer.style.justifyContent = 'space-between';
+        actionContainer.style.marginTop = '10px';
+
+        const buttonStyle = {
+            display: 'inline-block',
+            width: '48%', // 横並び時の幅を調整
+            padding: '10px',
+            backgroundColor: '#FF9800',
+            color: 'white',
+            border: 'none',
+            borderRadius: '3px',
+            cursor: 'pointer',
+            textAlign: 'center'
+        };
+
+        // 購入履歴のダウンロードボタン
+        const downloadButton = document.createElement('button');
+        downloadButton.innerText = '購入履歴のダウンロード';
+        Object.assign(downloadButton.style, buttonStyle);
+
+        downloadButton.addEventListener('click', () => {
+            if (allData.length === 0) {
+                alert('データが空です。先にデータを取得してください。');
+                return;
+            }
+            downloadJSON(allData); // データをダウンロード
+        });
+
+        // データリフレッシュボタン
+        const refreshButton = document.createElement('button');
+        refreshButton.innerText = 'データリフレッシュ';
+        Object.assign(refreshButton.style, buttonStyle);
+
+        refreshButton.addEventListener('click', () => {
+            if (confirm('過去のデータを消去しますか？')) {
+                localStorage.removeItem('purchaseHistory'); // ローカルストレージからデータを削除
+                allData = []; // メモリ上のデータもクリア
+                alert('データがリフレッシュされました。');
+            }
+        });
+
+        actionContainer.appendChild(downloadButton);
+        actionContainer.appendChild(refreshButton);
+
+
         container.appendChild(title);
         container.appendChild(startButton);
         container.appendChild(input);
         container.appendChild(searchButton);
         container.appendChild(resultContainer);
+        container.appendChild(actionContainer);
         document.body.appendChild(container);
     }
 
