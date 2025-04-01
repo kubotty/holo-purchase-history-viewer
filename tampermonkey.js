@@ -358,7 +358,6 @@
         actionContainer.appendChild(downloadButton);
         actionContainer.appendChild(refreshButton);
 
-
         container.appendChild(title);
         container.appendChild(startButton);
         container.appendChild(input);
