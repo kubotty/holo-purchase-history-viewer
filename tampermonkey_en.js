@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         購入履歴検索ツール
+// @name         Purchase History Search Tool
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  購入履歴の詳細情報を取得し、次のページに自動遷移
+// @description  Retrieve detailed purchase history information and automatically navigate to the next page
 // @author       kubotty
 // @match        https://shop.hololivepro.com/en/account
 // @match        https://shop.hololivepro.com/en/account/
@@ -14,39 +14,39 @@
 (function() {
     'use strict';
 
-    let allData = loadPreviousData(); // 全ページのデータを格納する配列
+    let allDataEn = loadPreviousData(); // Array to store data from all pages
 
-    // 過去データをローカルストレージから取得
+    // Retrieve past data from local storage
     function loadPreviousData() {
-        const storedData = localStorage.getItem('purchaseHistory');
+        const storedData = localStorage.getItem('purchaseHistoryEn');
         return storedData ? JSON.parse(storedData) : [];
     }
 
-    // データをローカルストレージに保存
+    // Save data to local storage
     function saveDataToLocalStorage(data) {
-        localStorage.setItem('purchaseHistory', JSON.stringify(data));
-        // 1. 開発者ツール
-        // 2. 「Application」タブを選択
-        // 3. 左側の「Storage」セクションから「Local Storage」を選択。
-        // 4. 対象のドメインを選択すると、保存されたデータが表示されます。
+        localStorage.setItem('purchaseHistoryEn', JSON.stringify(data));
+        // 1. Developer Tools
+        // 2. Select the "Application" tab
+        // 3. From the left "Storage" section, select "Local Storage".
+        // 4. Select the target domain to view the saved data.
     }
 
-    // 次のページのデータを再帰的に取得
+    // Recursively fetch data from the next page
     async function fetchNextPageAndGetData(url) {
         if (!url) {
-            // 次のページがない場合、データを保存してダウンロード
-            // 注文番号を昇順にソート
-            allData.sort((a, b) => a.注文番号.localeCompare(b.注文番号, 'ja', { numeric: true }));
+            // If there is no next page, save and download the data
+            // Sort order numbers in ascending order
+            allDataEn.sort((a, b) => a.orderNumber.localeCompare(b.orderNumber, 'en', { numeric: true }));
 
-            saveDataToLocalStorage(allData);
-            alert('すべてのページのデータを取得しました！');
+            saveDataToLocalStorage(allDataEn);
+            alert('Data from all pages has been retrieved!');
             return;
         }
 
         console.log(`Fetching data from: ${url}`);
         const response = await fetch(url);
         if (!response.ok) {
-            console.error(`HTTPエラー: ${response.status} ${response.statusText}`);
+            console.error(`HTTP Error: ${response.status} ${response.statusText}`);
             return;
         }
 
@@ -54,101 +54,101 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
 
-        // 現在のページのデータを取得
-        const rows = doc.querySelectorAll('.AccountTable tbody tr'); // テーブルの行を取得
+        // Retrieve data from the current page
+        const rows = doc.querySelectorAll('.AccountTable tbody tr'); // Get table rows
         for (const row of rows) {
-            const orderNumber = row.querySelector('td:nth-child(1) a').innerText; // 注文番号
-            const orderDate = row.querySelector('td:nth-child(2)').innerText; // 日付
-            const paymentStatus = row.querySelector('td:nth-child(3)').innerText; // 支払状況
-            const shippingStatus = row.querySelector('td:nth-child(4)').innerText; // 発送状況
-            // 合計金額の処理
-            const totalAmountElement = row.querySelector('td:nth-child(5) span'); // 合計金額の要素を取得
-            let totalAmount = totalAmountElement ? totalAmountElement.getAttribute('data-price') : ''; // data-price 属性を取得
-            let currency = totalAmountElement ? totalAmountElement.getAttribute('data-currency') : ''; // data-currency 属性を取得
-            const detailLink = row.querySelector('td:nth-child(1) a').href; // 詳細リンク
+            const orderNumber = row.querySelector('td:nth-child(1) a').innerText; // Order number
+            const orderDate = row.querySelector('td:nth-child(2)').innerText; // Date
+            const paymentStatus = row.querySelector('td:nth-child(3)').innerText; // Payment status
+            const shippingStatus = row.querySelector('td:nth-child(4)').innerText; // Shipping status
+            // Process total amount
+            const totalAmountElement = row.querySelector('td:nth-child(5) span'); // Get total amount element
+            let totalAmount = totalAmountElement ? totalAmountElement.getAttribute('data-price') : ''; // Get data-price attribute
+            let currency = totalAmountElement ? totalAmountElement.getAttribute('data-currency') : ''; // Get data-currency attribute
+            const detailLink = row.querySelector('td:nth-child(1) a').href; // Detail link
 
-            // 既存データの確認
-            const existingOrder = allData.find(data => data.注文番号 === orderNumber);
+            // Check for existing data
+            const existingOrder = allDataEn.find(data => data.orderNumber === orderNumber);
             if (existingOrder) {
-                // 支払状況・発送状況を更新
-                existingOrder.支払状況 = paymentStatus;
-                existingOrder.発送状況 = shippingStatus;
-                console.log(`注文番号 ${orderNumber} は既存データのためスキップ`);
+                // Update payment and shipping status
+                existingOrder.paymentStatus = paymentStatus;
+                existingOrder.shippingStatus = shippingStatus;
+                console.log(`Order number ${orderNumber} is already in the data, skipping.`);
                 continue;
             }
 
-            // 詳細ページのデータを取得
-            console.log(`注文番号: ${orderNumber}`);
-            console.log(`日付: ${orderDate}`);
-            console.log(`支払状況: ${paymentStatus}`);
-            console.log(`発送状況: ${shippingStatus}`);
-            console.log(`合計金額 (data-price): ${totalAmount}`);
-            console.log(`通貨 (data-currency): ${currency}`);
-            console.log(`詳細リンク: ${detailLink}`);
+            // Retrieve data from the detail page
+            console.log(`Order number: ${orderNumber}`);
+            console.log(`Date: ${orderDate}`);
+            console.log(`Payment status: ${paymentStatus}`);
+            console.log(`Shipping status: ${shippingStatus}`);
+            console.log(`Total amount (data-price): ${totalAmount}`);
+            console.log(`Currency (data-currency): ${currency}`);
+            console.log(`Detail link: ${detailLink}`);
             const detailData = await fetchDetailData(detailLink);
 
             console.log("\n");
 
-            // データを保存
-            allData.push({
-                注文番号: orderNumber,
-                日付: orderDate,
-                支払状況: paymentStatus,
-                発送状況: shippingStatus,
-                合計金額: totalAmount,
-                通貨: currency,
-                詳細: detailData
+            // Save data
+            allDataEn.push({
+                orderNumber: orderNumber,
+                date: orderDate,
+                paymentStatus: paymentStatus,
+                shippingStatus: shippingStatus,
+                totalAmount: totalAmount,
+                currency: currency,
+                details: detailData
             });
         }
 
-        // 次のページのURLを取得
-        const nextButton = doc.querySelector('.Pagination_arrow.-next'); // 次ページボタンのクラス名を指定
+        // Get the URL of the next page
+        const nextButton = doc.querySelector('.Pagination_arrow.-next'); // Specify the class name of the next page button
         const nextPageUrl = nextButton ? nextButton.href : null;
 
-        // 再帰的に次のページを取得
+        // Recursively fetch the next page
         await fetchNextPageAndGetData(nextPageUrl);
     }
 
-    // 詳細ページのデータを取得
+    // Retrieve data from the detail page
     async function fetchDetailData(url) {
-        const response = await fetch(url); // 詳細ページにアクセス
+        const response = await fetch(url); // Access the detail page
         if (!response.ok) {
-            console.error(`HTTPエラー: ${response.status} ${response.statusText}`);
-            return null; // エラー時は処理を中断
+            console.error(`HTTP Error: ${response.status} ${response.statusText}`);
+            return null; // Abort processing on error
         }
         const text = await response.text();
         if (!text) {
-            console.error('レスポンスが空です');
-            return null; // 空のレスポンスの場合は処理を中断
+            console.error('Response is empty');
+            return null; // Abort processing if the response is empty
         }
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
         console.log(doc);
 
-        // 商品情報を取得
-        const items = doc.querySelectorAll('.CartItem'); // 商品リストのクラス名
+        // Retrieve product information
+        const items = doc.querySelectorAll('.CartItem'); // Class name of the product list
         const details = [];
         items.forEach(item => {
-            const productName = item.querySelector('.CartItem__Title a').innerText; // 商品名
-            const productVariant = item.querySelector('.CartItem__Variant')?.innerText || ''; // バリエーション情報
-            const quantity = item.querySelector('.CartItem_footerItem.Text--alignCenter').innerText; // 数量
-            const totalPrice = item.querySelector('.CartItem_footerItem.Text--alignRight .money').innerText; // 合計金額
+            const productName = item.querySelector('.CartItem__Title a').innerText; // Product name
+            const productVariant = item.querySelector('.CartItem__Variant')?.innerText || ''; // Variant information
+            const quantity = item.querySelector('.CartItem_footerItem.Text--alignCenter').innerText; // Quantity
+            const totalPrice = item.querySelector('.CartItem_footerItem.Text--alignRight .money').innerText; // Total price
 
-            console.log(`商品名: ${productName}`);
-            console.log(`バリエーション: ${productVariant}`);
-            console.log(`数量: ${quantity}`);
-            console.log(`合計金額: ${totalPrice}`);
+            console.log(`Product name: ${productName}`);
+            console.log(`Variant: ${productVariant}`);
+            console.log(`Quantity: ${quantity}`);
+            console.log(`Total price: ${totalPrice}`);
 
             details.push({
-                商品名: productName,
-                バリエーション: productVariant,
-                数量: quantity,
-                合計金額: totalPrice
+                productName: productName,
+                variant: productVariant,
+                quantity: quantity,
+                totalPrice: totalPrice
             });
         });
 
-        // 小計、送料、税、合計を取得
-        const rows = doc.querySelectorAll('tfoot tr'); // tfoot内のすべての行を取得
+        // Retrieve subtotal, shipping, tax, and total
+        const rows = doc.querySelectorAll('tfoot tr'); // Get all rows in tfoot
 
         let subtotal = '';
         let shipping = '';
@@ -156,43 +156,42 @@
         let total = '';
 
         rows.forEach(row => {
-            const labelElement = row.querySelector('td:nth-child(2)'); // ラベルが含まれる列を取得
-            const valueElement = row.querySelector('td:nth-child(3) .money'); // 金額が含まれる列を取得
+            const labelElement = row.querySelector('td:nth-child(2)'); // Get the column containing the label
+            const valueElement = row.querySelector('td:nth-child(3) .money'); // Get the column containing the amount
 
-            if (!labelElement || !valueElement) return; // 要素が存在しない場合はスキップ
+            if (!labelElement || !valueElement) return; // Skip if elements do not exist
 
-            const label = labelElement.innerText.trim(); // ラベルのテキストを取得
-            const value = valueElement.innerText.trim(); // 金額のテキストを取得
+            const label = labelElement.innerText.trim(); // Get the text of the label
+            const value = valueElement.innerText.trim(); // Get the text of the amount
 
-            if (label.includes('小計')) {
+            if (label.includes('Subtotal')) {
                 subtotal = value;
-            } else if (label.includes('送料')) {
+            } else if (label.includes('Shipping')) {
                 shipping = value;
-            } else if (label.includes('税')) {
+            } else if (label.includes('Tax')) {
                 tax = value;
-            } else if (label.includes('合計')) {
+            } else if (label.includes('Total')) {
                 total = value;
             }
         });
 
-        console.log(`小計: ${subtotal}`);
-        console.log(`送料: ${shipping}`);
-        console.log(`税: ${tax}`);
-        console.log(`合計: ${total}`);
-
+        console.log(`Subtotal: ${subtotal}`);
+        console.log(`Shipping: ${shipping}`);
+        console.log(`Tax: ${tax}`);
+        console.log(`Total: ${total}`);
 
         return {
-            商品詳細: details,
-            小計: subtotal,
-            送料: shipping,
-            税: tax,
-            合計: total
+            productDetails: details,
+            subtotal: subtotal,
+            shipping: shipping,
+            tax: tax,
+            total: total
         };
     }
 
-    // JSONをダウンロード
+    // Download JSON
     function downloadJSON(data, filename = 'purchase_history.json') {
-        const json = JSON.stringify(data, null, 2); // JSON形式に変換（インデント付き）
+        const json = JSON.stringify(data, null, 2); // Convert to JSON format (with indentation)
         const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -203,8 +202,8 @@
     function addInterface() {
         const container = document.createElement('div');
         container.style.position = 'fixed';
-        container.style.bottom = '10px'; // 画面下から10px
-        container.style.right = '10px'; // 画面右から10px
+        container.style.bottom = '10px'; // 10px from the bottom of the screen
+        container.style.right = '10px'; // 10px from the right of the screen
         container.style.width = '400px';
         container.style.padding = '15px';
         container.style.backgroundColor = 'white';
@@ -214,12 +213,12 @@
         container.style.zIndex = 1000;
 
         const title = document.createElement('h3');
-        title.innerText = '購入履歴検索ツール';
+        title.innerText = 'Purchase History Search Tool';
         title.style.margin = '0 0 10px 0';
         title.style.fontSize = '16px';
 
         const startButton = document.createElement('button');
-        startButton.innerText = 'データ取得開始';
+        startButton.innerText = 'Start Data Retrieval';
         startButton.style.width = '100%';
         startButton.style.padding = '10px';
         startButton.style.backgroundColor = '#4CAF50';
@@ -230,29 +229,29 @@
         startButton.style.marginBottom = '10px';
 
         startButton.addEventListener('click', async () => {
-            alert('データ取得を開始します！');
-            const initialUrl = window.location.href; // 現在のページのURLを取得
-            await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
+            alert('Starting data retrieval!');
+            const initialUrl = window.location.href; // Get the URL of the current page
+            await fetchNextPageAndGetData(initialUrl); // Retrieve data starting from the first page
         });
 
         const input = document.createElement('input');
         input.type = 'text';
-        input.placeholder = '商品名を入力';
+        input.placeholder = 'Enter product name';
         input.style.width = '100%';
         input.style.padding = '8px';
         input.style.marginBottom = '10px';
         input.style.border = '1px solid #ccc';
         input.style.borderRadius = '3px';
 
-        // Enterキーで検索を実行
+        // Execute search on Enter key press
         input.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                searchButton.click(); // 検索ボタンのクリックイベントをトリガー
+                searchButton.click(); // Trigger the click event of the search button
             }
         });
 
         const searchButton = document.createElement('button');
-        searchButton.innerText = '検索';
+        searchButton.innerText = 'Search';
         searchButton.style.width = '100%';
         searchButton.style.padding = '10px';
         searchButton.style.backgroundColor = '#2196F3';
@@ -270,25 +269,25 @@
 
         searchButton.addEventListener('click', () => {
             const query = input.value.trim();
-            resultContainer.innerHTML = ''; // 検索結果をクリア
+            resultContainer.innerHTML = ''; // Clear search results
 
-            // allDataが空の場合のエラーチェック
-            if (allData.length === 0) {
-                alert('データが空です。先にデータを取得してください。');
+            // Error check if allDataEn is empty
+            if (allDataEn.length === 0) {
+                alert('Data is empty. Please retrieve data first.');
                 return;
             }
 
             if (!query) {
-                alert('検索キーワードを入力してください。');
+                alert('Please enter a search keyword.');
                 return;
             }
 
-            // allDataから商品名を検索
+            // Search for product names in allDataEn
             const results = [];
-            allData.forEach(order => {
-                if (order.詳細 && order.詳細.商品詳細) {
-                    order.詳細.商品詳細.forEach(item => {
-                        if (item.商品名.includes(query)) {
+            allDataEn.forEach(order => {
+                if (order.details && order.details.productDetails) {
+                    order.details.productDetails.forEach(item => {
+                        if (item.productName.includes(query)) {
                             results.push(item);
                         }
                     });
@@ -296,16 +295,16 @@
             });
 
             if (results.length === 0) {
-                resultContainer.innerHTML = '<p>該当する商品が見つかりませんでした。</p>';
+                resultContainer.innerHTML = '<p>No matching products found.</p>';
             } else {
                 results.forEach(item => {
                     const resultItem = document.createElement('div');
                     resultItem.style.marginBottom = '10px';
                     resultItem.innerHTML = `
-                        <p><strong>商品名:</strong> ${item.商品名}</p>
-                        <p><strong>バリエーション:</strong> ${item.バリエーション}</p>
-                        <p><strong>数量:</strong> ${item.数量}</p>
-                        <p><strong>合計金額:</strong> ${item.合計金額}</p>
+                        <p><strong>Product Name:</strong> ${item.productName}</p>
+                        <p><strong>Variant:</strong> ${item.variant}</p>
+                        <p><strong>Quantity:</strong> ${item.quantity}</p>
+                        <p><strong>Total Price:</strong> ${item.totalPrice}</p>
                     `;
                     resultContainer.appendChild(resultItem);
                 });
@@ -313,13 +312,13 @@
         });
 
         const actionContainer = document.createElement('div');
-        actionContainer.style.display = 'flex'; // 横並びにする
+        actionContainer.style.display = 'flex'; // Arrange horizontally
         actionContainer.style.justifyContent = 'space-between';
         actionContainer.style.marginTop = '10px';
 
         const buttonStyle = {
             display: 'inline-block',
-            width: '48%', // 横並び時の幅を調整
+            width: '48%', // Adjust width for horizontal arrangement
             padding: '10px',
             backgroundColor: '#FF9800',
             color: 'white',
@@ -329,35 +328,34 @@
             textAlign: 'center'
         };
 
-        // 購入履歴のダウンロードボタン
+        // Download purchase history button
         const downloadButton = document.createElement('button');
-        downloadButton.innerText = '購入履歴のダウンロード';
+        downloadButton.innerText = 'Download Purchase History';
         Object.assign(downloadButton.style, buttonStyle);
 
         downloadButton.addEventListener('click', () => {
-            if (allData.length === 0) {
-                alert('データが空です。先にデータを取得してください。');
+            if (allDataEn.length === 0) {
+                alert('Data is empty. Please retrieve data first.');
                 return;
             }
-            downloadJSON(allData); // データをダウンロード
+            downloadJSON(allDataEn); // Download data
         });
 
-        // データリフレッシュボタン
+        // Data refresh button
         const refreshButton = document.createElement('button');
-        refreshButton.innerText = 'データリフレッシュ';
+        refreshButton.innerText = 'Refresh Data';
         Object.assign(refreshButton.style, buttonStyle);
 
         refreshButton.addEventListener('click', () => {
-            if (confirm('過去のデータを消去しますか？')) {
-                localStorage.removeItem('purchaseHistory'); // ローカルストレージからデータを削除
-                allData = []; // メモリ上のデータもクリア
-                alert('データがリフレッシュされました。');
+            if (confirm('Do you want to delete past data?')) {
+                localStorage.removeItem('purchaseHistoryEn'); // Delete data from local storage
+                allDataEn = []; // Clear data in memory
+                alert('Data has been refreshed.');
             }
         });
 
         actionContainer.appendChild(downloadButton);
         actionContainer.appendChild(refreshButton);
-
 
         container.appendChild(title);
         container.appendChild(startButton);
@@ -368,6 +366,6 @@
         document.body.appendChild(container);
     }
 
-    // ページ読み込み後にインターフェースを追加
+    // Add interface after page load
     window.addEventListener('load', addInterface);
 })();
