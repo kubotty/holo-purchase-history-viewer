@@ -32,7 +32,7 @@
     }
 
     // 次のページのデータを再帰的に取得
-    async function fetchNextPageAndGetData(url) {
+    async function fetchNextPageAndGetData(url, updateStatusCallback) {
         if (!url) {
             // 次のページがない場合、データを保存してダウンロード
             // 注文番号を昇順にソート
@@ -40,6 +40,7 @@
 
             saveDataToLocalStorage(allData);
             alert('すべてのページのデータを取得しました！');
+            updateStatusCallback(false); // ボタンを元の状態にリセット
             return;
         }
 
@@ -47,6 +48,7 @@
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`HTTPエラー: ${response.status} ${response.statusText}`);
+            updateStatusCallback(false); // ボタンを元の状態にリセット
             return;
         }
 
@@ -105,8 +107,13 @@
         const nextButton = doc.querySelector('.Pagination_arrow.-next'); // 次ページボタンのクラス名を指定
         const nextPageUrl = nextButton ? nextButton.href : null;
 
+        // 現在のページ番号をステータスに反映
+        const currentPageMatch = url.match(/page=(\d+)/);
+        const currentPage = currentPageMatch ? currentPageMatch[1] : '1';
+        updateStatusCallback(true, currentPage);
+
         // 再帰的に次のページを取得
-        await fetchNextPageAndGetData(nextPageUrl);
+        await fetchNextPageAndGetData(nextPageUrl, updateStatusCallback);
     }
 
     // 詳細ページのデータを取得
@@ -232,7 +239,20 @@
         startButton.addEventListener('click', async () => {
             alert('データ取得を開始します！');
             const initialUrl = window.location.href; // 現在のページのURLを取得
-            await fetchNextPageAndGetData(initialUrl); // 最初のページからデータを取得
+
+            // ボタンに「取得中（Xページ）」を表示する
+            const updateStatus = (isFetching, currentPage = '') => {
+                if (isFetching) {
+                    startButton.innerText = `取得中（${currentPage}ページ目）`;
+                    startButton.disabled = true;
+                } else {
+                    startButton.innerText = 'データ取得開始';
+                    startButton.disabled = false;
+                }
+            };
+
+            updateStatus(true, '1'); // 初期状態
+            await fetchNextPageAndGetData(initialUrl, updateStatus); // 最初のページからデータを取得
         });
 
         const input = document.createElement('input');
