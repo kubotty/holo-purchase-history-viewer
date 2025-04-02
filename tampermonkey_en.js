@@ -52,6 +52,11 @@
             return;
         }
 
+        // Update status with the current page number
+        const currentPageMatch = url.match(/page=(\d+)/);
+        const currentPage = currentPageMatch ? currentPageMatch[1] : '1';
+        updateStatusCallback(true, currentPage);
+
         const text = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
@@ -106,11 +111,6 @@
         // Get the URL of the next page
         const nextButton = doc.querySelector('.Pagination_arrow.-next'); // Specify the class name of the next page button
         const nextPageUrl = nextButton ? nextButton.href : null;
-
-        // Update status with the current page number
-        const currentPageMatch = url.match(/page=(\d+)/);
-        const currentPage = currentPageMatch ? currentPageMatch[1] : '1';
-        updateStatusCallback(true, currentPage);
 
         // Recursively fetch the next page
         await fetchNextPageAndGetData(nextPageUrl, updateStatusCallback);

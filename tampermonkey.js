@@ -52,6 +52,11 @@
             return;
         }
 
+        // 現在のページ番号をステータスに反映
+        const currentPageMatch = url.match(/page=(\d+)/);
+        const currentPage = currentPageMatch ? currentPageMatch[1] : '1';
+        updateStatusCallback(true, currentPage);
+
         const text = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
@@ -106,11 +111,6 @@
         // 次のページのURLを取得
         const nextButton = doc.querySelector('.Pagination_arrow.-next'); // 次ページボタンのクラス名を指定
         const nextPageUrl = nextButton ? nextButton.href : null;
-
-        // 現在のページ番号をステータスに反映
-        const currentPageMatch = url.match(/page=(\d+)/);
-        const currentPage = currentPageMatch ? currentPageMatch[1] : '1';
-        updateStatusCallback(true, currentPage);
 
         // 再帰的に次のページを取得
         await fetchNextPageAndGetData(nextPageUrl, updateStatusCallback);
