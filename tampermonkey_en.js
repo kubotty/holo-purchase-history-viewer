@@ -32,7 +32,7 @@
     }
 
     // Recursively fetch data from the next page
-    async function fetchNextPageAndGetData(url) {
+    async function fetchNextPageAndGetData(url, updateStatusCallback) {
         if (!url) {
             // If there is no next page, save and download the data
             // Sort order numbers in ascending order
@@ -40,6 +40,7 @@
 
             saveDataToLocalStorage(allDataEn);
             alert('Data from all pages has been retrieved!');
+            updateStatusCallback(false); // Reset button to original state
             return;
         }
 
@@ -47,8 +48,14 @@
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`HTTP Error: ${response.status} ${response.statusText}`);
+            updateStatusCallback(false); // Reset button to original state
             return;
         }
+
+        // Update status with the current page number
+        const currentPageMatch = url.match(/page=(\d+)/);
+        const currentPage = currentPageMatch ? currentPageMatch[1] : '1';
+        updateStatusCallback(true, currentPage);
 
         const text = await response.text();
         const parser = new DOMParser();
@@ -106,7 +113,7 @@
         const nextPageUrl = nextButton ? nextButton.href : null;
 
         // Recursively fetch the next page
-        await fetchNextPageAndGetData(nextPageUrl);
+        await fetchNextPageAndGetData(nextPageUrl, updateStatusCallback);
     }
 
     // Retrieve data from the detail page
@@ -231,7 +238,20 @@
         startButton.addEventListener('click', async () => {
             alert('Starting data retrieval!');
             const initialUrl = window.location.href; // Get the URL of the current page
-            await fetchNextPageAndGetData(initialUrl); // Retrieve data starting from the first page
+
+            // Update button to show "Retrieving (X pages)"
+            const updateStatus = (isFetching, currentPage = '') => {
+                if (isFetching) {
+                    startButton.innerText = `Retrieving (${currentPage} page${currentPage > 1 ? 's' : ''})`;
+                    startButton.disabled = true;
+                } else {
+                    startButton.innerText = 'Start Data Retrieval';
+                    startButton.disabled = false;
+                }
+            };
+
+            updateStatus(true, '1'); // Initial status
+            await fetchNextPageAndGetData(initialUrl, updateStatus); // Retrieve data starting from the first page
         });
 
         const input = document.createElement('input');
