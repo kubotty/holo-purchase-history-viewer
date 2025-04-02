@@ -1,4 +1,6 @@
 # Holo Purchase History Viewer
+[English](#English)
+
 
 このプロジェクトは、某所の購入履歴ページから詳細情報を取得し、JSON形式で保存するTampermonkeyスクリプトです。
 
@@ -10,7 +12,7 @@
 
 ## 使用方法
 1. [Tampermonkey](https://www.tampermonkey.net/) をインストールします。
-2. このリポジトリのスクリプトをコピーし、Tampermonkeyに新しいスクリプトとして追加します。
+2. このリポジトリのスクリプト (tampermonkey.js) をコピーし、Tampermonkeyに新しいスクリプトとして追加します。
 3. 購入履歴ページの **1ページ目** にアクセスします。
 4. 右下に表示される「データ取得開始」ボタンをクリックします。
 5. すべてのページのデータが取得されると、JSONファイルが自動的にダウンロードされます。
@@ -42,3 +44,22 @@
     }
   }
 ]
+```
+
+# English
+
+This project is a Tampermonkey script that retrieves detailed information from a purchase history page and saves it in JSON format.
+
+## Features
+- Retrieves detailed purchase history information (order number, date, payment status, shipping status, total amount, currency, and detailed information).
+- Automatically retrieves purchase history spanning multiple pages.
+- Downloads the retrieved data in JSON format.
+- Adds a "Start Data Retrieval" button at the bottom right corner.
+
+## How to Use
+1. Install [Tampermonkey](https://www.tampermonkey.net/).
+2. Copy the script from this repository (tampermonkey_en.js) and add it as a new script in Tampermonkey.
+3. Access the **first page** of the purchase history.
+4. Click the "Start Data Retrieval" button displayed at the bottom right corner.
+5. Once data from all pages is retrieved, a JSON file will be automatically downloaded.
+   - It will take approximately 5 seconds per page, so please keep the tab open during the process.
