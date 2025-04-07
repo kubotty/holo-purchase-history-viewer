@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Purchase History Search Tool
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.0.0
 // @description  Retrieve detailed purchase history information and automatically navigate to the next page
 // @author       kubotty
 // @match        https://shop.hololivepro.com/en/account
