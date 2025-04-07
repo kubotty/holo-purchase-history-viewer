@@ -9,6 +9,9 @@
 // @match        https://shop.hololivepro.com/account?page=*
 // @match        https://shop.hololivepro.com/account/?page=*
 // @grant        none
+// @updateURL    https://github.com/kubotty/holo-purchase-history-viewer/raw/refs/heads/main/hpro-purchase-history-searcher.user.js
+// @downloadURL  https://github.com/kubotty/holo-purchase-history-viewer/raw/refs/heads/main/hpro-purchase-history-searcher.user.js
+// @supportURL   https://github.com/kubotty/holo-purchase-history-viewer
 // ==/UserScript==
 
 (function() {
