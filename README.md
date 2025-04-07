@@ -12,7 +12,7 @@
 
 ## 使用方法
 1. [Tampermonkey](https://www.tampermonkey.net/) をインストールします。
-2. このリポジトリのスクリプト (tampermonkey.js) をコピーし、Tampermonkeyに新しいスクリプトとして追加します。
+2. このリポジトリのスクリプト ([hpro-purchase-history-searcher.user.js](https://github.com/kubotty/holo-purchase-history-viewer/raw/refs/heads/main/hpro-purchase-history-searcher.user.js)) にアクセスしてスクリプトを追加する。
 3. 購入履歴ページの **1ページ目** にアクセスします。
 4. 右下に表示される「データ取得開始」ボタンをクリックします。
 5. すべてのページのデータが取得されると、JSONファイルが自動的にダウンロードされます。
@@ -58,7 +58,7 @@ This project is a Tampermonkey script that retrieves detailed information from a
 
 ## How to Use
 1. Install [Tampermonkey](https://www.tampermonkey.net/).
-2. Copy the script from this repository (tampermonkey_en.js) and add it as a new script in Tampermonkey.
+2. Access the script from this repository ([hpro-purchase-history-searcher_en.user.js](https://github.com/kubotty/holo-purchase-history-viewer/raw/refs/heads/main/hpro-purchase-history-searcher_en.user.js)) and add it as a new script in Tampermonkey.
 3. Access the **first page** of the purchase history.
 4. Click the "Start Data Retrieval" button displayed at the bottom right corner.
 5. Once data from all pages is retrieved, a JSON file will be automatically downloaded.

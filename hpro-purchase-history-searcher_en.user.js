@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Purchase History Search Tool
+// @name         Holo-Pro Shop Purchase History Search Tool
 // @namespace    http://tampermonkey.net/
 // @version      1.0.0
 // @description  Retrieve detailed purchase history information and automatically navigate to the next page

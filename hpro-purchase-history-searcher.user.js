@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         購入履歴検索ツール
+// @name         ホロプロショップ購入履歴検索ツール
 // @namespace    http://tampermonkey.net/
 // @version      1.0.0
 // @description  購入履歴の詳細情報を取得し、次のページに自動遷移
